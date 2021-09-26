@@ -3,17 +3,19 @@
 #include <Windows.h>
 #include <string.h>
 #include <conio.h>
+#define VER 22
+#define HOR 12
 void block(i, k, t);
 void print();
 void type_f(n);
 char out[100][100];
-int in[20][10] = { 0 }; //가로 36, 세로 60, 크기를 바꿀경우 print()도 바꿔줘야함
+int in[VER][HOR] = { 0 }; //가로 36, 세로 60, 크기를 바꿀경우 print()도 바꿔줘야함
 void erase(i, k, t, n);
 void turn(i, k, t, n);
 void block_down(k);
 int position_rows = 0;
 int position_cols = 0;
-void block_move(k); 
+void block_move(k);
 void movement_right(k);
 void movement_left(k);
 void movement_turn(k);
@@ -38,7 +40,7 @@ struct block {
     int cols_type; //4가지;
     int spin; //4가지;
 };
-struct block b[100] = {0, 0, 0};
+struct block b[100] = { 0, 0, 0 };
 
 
 int main(void)
@@ -57,15 +59,15 @@ int main(void)
 
         if (b[n].type == 0)
         {
-            repeat = 18;
+            repeat = VER - 2;
         }
         else if (b[n].type == 6)
         {
-            repeat = 16;
+            repeat = VER - 4;
         }
         else
         {
-            repeat = 17;
+            repeat = VER - 3;
         }
 
         for (i = 0; i < repeat; i++)
@@ -80,7 +82,7 @@ int main(void)
         system("cls");
         check_move();
         system("cls");
-        
+
         if (check_finish() == 1)
         {
             break;
@@ -90,7 +92,7 @@ int main(void)
         count = 0;
         n++;
     }
-    
+
     ending();
 
     return 0;
@@ -98,11 +100,52 @@ int main(void)
 
 void print_point()
 {
-    printf("■■■■■■■■■■■■\n");
-    printf("■                    ■\n");
-    printf("□       %2d,000       □\n", point);
-    printf("■                    ■\n");
-    printf("■■■■■■■■■■■■\n\n");
+    printf("■■■■■■■■■■■■");
+    if (HOR > 10)
+    {
+        for (int r = 0; r < HOR - 10; r++)
+        {
+            printf("■");
+        }
+    }
+    printf("\n");
+
+    printf("■                    ");
+    if (HOR > 10)
+    {
+        for (int r = 0; r < HOR - 10; r++)
+        {
+            printf("  ");
+        }
+    }
+    printf("■\n");
+    printf("□       %2d,000       ", point);
+    if (HOR > 10)
+    {
+        for (int r = 0; r < HOR - 10; r++)
+        {
+            printf("  ");
+        }
+    }
+    printf("□\n");
+    printf("■                    ");
+    if (HOR > 10)
+    {
+        for (int r = 0; r < HOR - 10; r++)
+        {
+            printf("  ");
+        }
+    }
+    printf("■\n");
+    printf("■■■■■■■■■■■■");
+    if (HOR > 10)
+    {
+        for (int r = 0; r < HOR - 10; r++)
+        {
+            printf("■");
+        }
+    }
+    printf("\n\n");
 }
 
 void opening()
@@ -114,7 +157,7 @@ void opening()
     printf("□                                      □\n");
     printf("■     시작하려면 s키를 입력하세요.     ■\n");
     printf("□                                      □\n");
-    printf("■   왼쪽 : w / 오른쪽 : d / 회전 : w   ■\n");
+    printf("■   왼쪽 : a / 오른쪽 : d / 회전 : w   ■\n");
     printf("□                                      □\n");
     printf("■                                      ■\n");
     printf("□■□■□■□■□■□■□■□■□■□■□\n");
@@ -232,28 +275,28 @@ void block_move(int k)
         {
             if (b[k].cols_type == 0)
             {
-                if (position_cols < 6)
+                if (position_cols < HOR - 4)
                 {
                     movement_right(k);
                 }
             }
             else if (b[k].cols_type == 1)
             {
-                if (position_cols < 7)
+                if (position_cols < HOR - 3)
                 {
                     movement_right(k);
                 }
             }
-            else if(b[k].cols_type == 2)
+            else if (b[k].cols_type == 2)
             {
-                if (position_cols < 8)
+                if (position_cols < HOR - 2)
                 {
                     movement_right(k);
                 }
             }
             else if (b[k].cols_type == 3)
             {
-                if (position_cols < 9)
+                if (position_cols < HOR - 1)
                 {
                     movement_right(k);
                 }
@@ -261,12 +304,12 @@ void block_move(int k)
         }
         else if (m == 97)
         {
-            
-            if (position_cols > 0)
+
+            if (position_cols > HOR - 10)
             {
                 movement_left(k);
             }
-            else if (position_cols <= 0 && count != 3)
+            else if (position_cols <= HOR - 10 && count != 3)
             {
                 if (net_turn > 1 && b[k].type == 0)
                 {
@@ -288,7 +331,7 @@ void block_move(int k)
                     movement_left(k);
                     count++;
                 }
-                
+
             }
         }
         else if (m == 119) //w키
@@ -298,6 +341,22 @@ void block_move(int k)
                 movement_turn(k);
             }
         }
+        else if (m == 32)
+        {
+            while (1)
+            {
+                erase(position_rows, position_cols, b[k].type, k);
+                if (stack(position_rows, position_cols, b[k].type, k) == 1)
+                {
+                    break;
+                }
+                position_rows += 1;
+                turn(position_rows, position_cols, b[k].type, k);
+            }
+            Sleep(300);
+            system("cls");
+            print();
+        }
     }
 }
 
@@ -305,13 +364,13 @@ int condition_not_turn(int k) // 회전 안되는 조건일때 1을 반환한다
 {
     int net_turn = b[k].spin % 4;
 
-    if (b[k].type == 0) 
+    if (b[k].type == 0)
     {
-        if (net_turn == 1 && position_cols == 8)
+        if (net_turn == 1 && position_cols == HOR - 2)
         {
             return 1;
         }
-        else if (net_turn == 3 && position_cols == -1)
+        else if (net_turn == 3 && position_cols == HOR - 11)
         {
             return 1;
         }
@@ -323,11 +382,11 @@ int condition_not_turn(int k) // 회전 안되는 조건일때 1을 반환한다
 
     if (b[k].type < 4 && b[k].type > 0) //1~3
     {
-        if (net_turn == 0 && position_cols == 8)
+        if (net_turn == 0 && position_cols == HOR - 2)
         {
             return 1;
         }
-        else if (net_turn == 2 && position_cols == -1)
+        else if (net_turn == 2 && position_cols == HOR -11)
         {
             return 1;
         }
@@ -339,11 +398,11 @@ int condition_not_turn(int k) // 회전 안되는 조건일때 1을 반환한다
 
     if (b[k].type < 6 && b[k].type > 3) //4~5
     {
-        if (net_turn == 3 && position_cols == 8)
+        if (net_turn == 3 && position_cols == HOR - 2)
         {
             return 1;
         }
-        else if (net_turn == 1 && position_cols == -1)
+        else if (net_turn == 1 && position_cols == HOR -11)
         {
             return 1;
         }
@@ -355,11 +414,11 @@ int condition_not_turn(int k) // 회전 안되는 조건일때 1을 반환한다
 
     if (b[k].type == 6)
     {
-        if (net_turn == 0 && position_cols > 6 && position_cols < 10) //7~9
+        if (net_turn == 0 && position_cols > HOR - 4 && position_cols < HOR) //7~9
         {
             return 1;
         }
-        else if (net_turn == 2 && position_cols > -4 && position_cols < 0)
+        else if (net_turn == 2 && position_cols > HOR -14 && position_cols < HOR - 10)
         {
             return 1;
         }
@@ -474,11 +533,19 @@ void block(int i, int k, int t)
 void print()
 {
     int i, k;
-    printf("□□□□□□□□□□□□\n");
-    for (i = 0; i < 20; i++)
+    printf("□□□□□□□□□□□□");
+    if (HOR > 10)
+    {
+        for (int r = 0; r < HOR - 10; r++)
+        {
+            printf("□");
+        }
+    }
+    printf("\n");
+    for (i = 0; i < VER; i++)
     {
         printf("□");
-        for (k = 0; k < 10; k++)
+        for (k = 0; k < HOR; k++)
         {
             if (in[i][k] == 1)
             {
@@ -494,7 +561,15 @@ void print()
         }
         printf("□\n");
     }
-    printf("□□□□□□□□□□□□\n");
+    printf("□□□□□□□□□□□□");
+    if (HOR > 10)
+    {
+        for (int r = 0; r < HOR - 10; r++)
+        {
+            printf("□");
+        }
+    }
+    printf("\n");
     print_point();
 }
 
@@ -794,7 +869,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 2][k + 1] += 1;
 
             b[n].cols_type = 2;
-            repeat = 18;
+            repeat = VER - 2;
         }
         else if (net_turn == 2)
         {
@@ -813,7 +888,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 1][k + 2] += 1;
 
             b[n].cols_type = 1;
-            repeat = 19;
+            repeat = VER - 1;
         }
         else if (net_turn == 0)
         {
@@ -852,7 +927,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 1][k] += 1;
 
             b[n].cols_type = 1;
-            repeat = 18;
+            repeat = VER - 2;
         }
         else if (net_turn == 0)
         {
@@ -862,7 +937,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 2][k + 1] += 1;
 
             b[n].cols_type = 2;
-            repeat = 17;
+            repeat = VER - 3;
         }
         break;
     case 2:
@@ -892,7 +967,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i][k + 1] += 1;
 
             b[n].cols_type = 1;
-            repeat = 18;
+            repeat = VER - 2;
         }
         else if (net_turn == 0)
         {
@@ -902,7 +977,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 2][k + 1] += 1;
 
             b[n].cols_type = 2;
-            repeat = 17;
+            repeat = VER - 3;
         }
         break;
     case 3:
@@ -932,7 +1007,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 1][k + 2] += 1;
 
             b[n].cols_type = 1;
-            repeat = 18;
+            repeat = VER - 2;
         }
         else if (net_turn == 0)
         {
@@ -942,7 +1017,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 2][k] += 1;
 
             b[n].cols_type = 2;
-            repeat = 17;
+            repeat = VER - 3;
         }
         break;
     case 4:
@@ -963,7 +1038,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 1][k + 1] += 1;
 
             b[n].cols_type = 1;
-            repeat = 18;
+            repeat = VER - 2;
         }
         else if (net_turn == 3)
         {
@@ -973,7 +1048,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 2][k + 1] += 1;
 
             b[n].cols_type = 1;
-            repeat = 17;
+            repeat = VER - 3;
         }
         else if (net_turn == 0)
         {
@@ -1003,7 +1078,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 1][k + 2] += 1;
 
             b[n].cols_type = 1;
-            repeat = 18;
+            repeat = VER - 2;
         }
         else if (net_turn == 3)
         {
@@ -1013,7 +1088,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 2][k] += 1;
 
             b[n].cols_type = 2;
-            repeat = 17;
+            repeat = VER - 3;
         }
         else if (net_turn == 0)
         {
@@ -1052,7 +1127,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i][k + 3] += 1;
 
             b[n].cols_type = 0;
-            repeat = 19;
+            repeat = VER - 1;
         }
         else if (net_turn == 0)
         {
@@ -1062,7 +1137,7 @@ void turn(int i, int k, int t, int n) //n은 블럭의 번호, t는 b[n].type의
             in[i + 3][k] += 1;
 
             b[n].cols_type = 3;
-            repeat = 16;
+            repeat = VER - 4;
         }
         break;
     default:
@@ -1308,14 +1383,14 @@ int stack(int i, int k, int t, int n) //바로 아래에 블럭이 있으면 1�
     case 5:
         if (net_turn == 1)
         {
-            if(in[i + 3][k + 1] == 1 || in[i + 2][k + 2] == 1)
+            if (in[i + 3][k + 1] == 1 || in[i + 2][k + 2] == 1)
             {
                 return 1;
             }
-        else
-        {
-            return 0;
-        }
+            else
+            {
+                return 0;
+            }
         }
         else if (net_turn == 2)
         {
@@ -1852,7 +1927,7 @@ int check_line(int j) //return 1이면 한 줄이 체워짐(한 줄이 모두 1�
     //in[20][10]
     int i;
     int cnt = 0;
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < HOR; i++)
     {
         if (in[j][i] == 0)
         {
@@ -1875,9 +1950,9 @@ int check_finish() //해당행에 숫자가 있으면 1을 반환함.
     //in[20][10]
     int i, j;
     int cnt = 0;
-    for (j = 0; j < 20; j++)
+    for (j = 0; j < VER; j++)
     {
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < HOR; i++)
         {
             if (in[j][i] > 1)
             {
@@ -1899,17 +1974,17 @@ int check_finish() //해당행에 숫자가 있으면 1을 반환함.
 void check_move()
 {
     int n, m, p;
-    for (p = 19; p > 0; p--)
+    for (p = VER - 1; p > 0; p--)
     {
         if (check_line(p) == 1)
         {
-            for (n = 0; n < 10; n++)
+            for (n = 0; n < HOR; n++)
             {
                 in[p][n] = 0;
             }
             for (m = p; m > 0; m--)
             {
-                for (n = 0; n < 10; n++)
+                for (n = 0; n < HOR; n++)
                 {
                     in[m][n] = in[m - 1][n];
                 }
@@ -1918,7 +1993,7 @@ void check_move()
             {
                 for (m = p; m > 0; m--)
                 {
-                    for (n = 0; n < 10; n++)
+                    for (n = 0; n < HOR; n++)
                     {
                         in[m][n] = in[m - 1][n];
                     }
@@ -1937,7 +2012,7 @@ int check_line_ex(int j) //return 1이면 한 줄이 비워짐(한 줄이 모두
     //in[20][10]
     int i;
     int cnt = 0;
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < HOR; i++)
     {
         if (in[j][i] == 0)
         {
@@ -1945,7 +2020,7 @@ int check_line_ex(int j) //return 1이면 한 줄이 비워짐(한 줄이 모두
         }
     }
 
-    if (cnt == 10)
+    if (cnt == HOR)
     {
         return 1;
     }
