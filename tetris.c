@@ -3,8 +3,8 @@
 #include <Windows.h>
 #include <string.h>
 #include <conio.h>
-#define VER 22
-#define HOR 12
+#define VER 21
+#define HOR 10
 void block(i, k, t);
 void print();
 void type_f(n);
@@ -15,7 +15,7 @@ void turn(i, k, t, n);
 void block_down(k);
 int position_rows = 0;
 int position_cols = 0;
-void block_move(k);
+void block_move(k, re);
 void movement_right(k);
 void movement_left(k);
 void movement_turn(k);
@@ -77,7 +77,7 @@ int main(void)
             {
                 break;
             }
-            block_move(n);
+            block_move(n, repeat - i - 1);
         }
         system("cls");
         check_move();
@@ -155,10 +155,10 @@ void opening()
     printf("□                                      □\n");
     printf("■                                      ■\n");
     printf("□                                      □\n");
-    printf("■     시작하려면 s키를 입력하세요.     ■\n");
+    printf("■   시작하려면 아무키나 입력하세요.    ■\n");
     printf("□                                      □\n");
     printf("■   왼쪽 : a / 오른쪽 : d / 회전 : w   ■\n");
-    printf("□                                      □\n");
+    printf("□       space바 : 아래로 밀착          □\n");
     printf("■                                      ■\n");
     printf("□■□■□■□■□■□■□■□■□■□■□\n");
     printf("  키보트 연타 시, 입력값이 모두 저장되고\n");
@@ -263,7 +263,7 @@ void ending()
     Sleep(1000);
 }
 
-void block_move(int k)
+void block_move(int k,int re)
 {
     int net_turn = b[k].spin % 4;
     int m;
@@ -343,19 +343,18 @@ void block_move(int k)
         }
         else if (m == 32)
         {
-            while (1)
+            for (int e = 0; e < re; e++)
             {
                 erase(position_rows, position_cols, b[k].type, k);
+                position_rows += 1;
+                turn(position_rows, position_cols, b[k].type, k);
                 if (stack(position_rows, position_cols, b[k].type, k) == 1)
                 {
                     break;
                 }
-                position_rows += 1;
-                turn(position_rows, position_cols, b[k].type, k);
             }
-            Sleep(300);
-            system("cls");
-            print();
+            repeat = 0;
+            
         }
     }
 }
@@ -386,7 +385,7 @@ int condition_not_turn(int k) // 회전 안되는 조건일때 1을 반환한다
         {
             return 1;
         }
-        else if (net_turn == 2 && position_cols == HOR -11)
+        else if (net_turn == 2 && position_cols == HOR - 11)
         {
             return 1;
         }
@@ -402,7 +401,7 @@ int condition_not_turn(int k) // 회전 안되는 조건일때 1을 반환한다
         {
             return 1;
         }
-        else if (net_turn == 1 && position_cols == HOR -11)
+        else if (net_turn == 1 && position_cols == HOR - 11)
         {
             return 1;
         }
@@ -418,7 +417,7 @@ int condition_not_turn(int k) // 회전 안되는 조건일때 1을 반환한다
         {
             return 1;
         }
-        else if (net_turn == 2 && position_cols > HOR -14 && position_cols < HOR - 10)
+        else if (net_turn == 2 && position_cols > HOR - 14 && position_cols < HOR - 10)
         {
             return 1;
         }
